@@ -1,9 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using TickClock.Data
+@using TickClock.Areas.Identity;
+@using TickClock.Areas.Identity.Data;
 @using AspNetCore.Identity.MongoDbCore.Models;
 
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<TickClockUser> SignInManager
+@inject UserManager<TickClockUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

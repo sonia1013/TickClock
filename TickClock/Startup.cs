@@ -1,24 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-//using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-//using TickClock.Data;
-using AspNetCore.Identity.Mongo;
+using Microsoft.Extensions.Logging;
+using AspNetCore.Identity.MongoDbCore.Infrastructure;
+using AspNetCore.Identity.MongoDbCore.Models;
 using AspNetCore.Identity.MongoDbCore;
+using MongoDB.Bson.Serialization;
 using TickClock.Models;
 using TickClock.Services;
+using AspNetCore.Identity.Mongo.Model;
+using AspNetCore.Identity.Mongo;
+using Microsoft.AspNetCore.Authorization;
+using TickClock.Areas.Identity.Data;
 
 namespace TickClock
 {
     public class Startup
     {
+        private string ConnectionString => Configuration.GetConnectionString("ConnectionString");
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -34,7 +40,25 @@ namespace TickClock
 
             services.AddSingleton<ITickClockDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<TickClockDatabaseSettings>>().Value);
-    
+
+            // At the ConfigureServices section in Startup.cs
+            //services.AddIdentityMongoDbProvider<MongoUser>();
+
+            //services.AddIdentityMongoDbProvider<TickClockUser>(identity =>
+            //{
+            //    identity.Password.RequireDigit = false;
+            //    identity.Password.RequireLowercase = false;
+            //    identity.Password.RequireNonAlphanumeric = false;
+            //    identity.Password.RequireUppercase = false;
+            //    identity.Password.RequiredLength = 1;
+            //    identity.Password.RequiredUniqueChars = 0;
+            //},
+            //    mongo =>
+            //    {
+            //        mongo.ConnectionString = ConnectionString;
+            //    }
+            //);
+
             services.AddSingleton<ClockService>();
 
             services.AddControllers();
@@ -43,7 +67,7 @@ namespace TickClock
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILoggerFactory loggerFactory)
         {
             if ( env.IsDevelopment() )
             {
